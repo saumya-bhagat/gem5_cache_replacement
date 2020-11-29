@@ -51,6 +51,7 @@
 #include <string>
 #include <vector>
 
+#include "debug/Cacheset.hh"
 #include "base/logging.hh"
 #include "base/types.hh"
 #include "mem/cache/base.hh"
@@ -196,6 +197,8 @@ class BaseSetAssoc : public BaseTags
         stats.tagsInUse++;
 
         // Update replacement policy
+        blk->replacementData->setindex = blk->getSet();
+        //DPRINTF(Cacheset, "Cache miss: cache blk set number %x\n", blk->replacementData->setindex);
         replacementPolicy->reset(blk->replacementData);
     }
 

@@ -33,12 +33,13 @@
 #include <memory>
 
 #include "base/cprintf.hh"
+#include "base/types.hh"
 
 /**
  * The replacement data needed by replacement policies. Each replacement policy
  * should have its own implementation of replacement data.
  */
-struct ReplacementData {};
+struct ReplacementData { int64_t setindex;};
 
 /**
  * A replaceable entry is a basic entry in a 2d table-like structure that needs
