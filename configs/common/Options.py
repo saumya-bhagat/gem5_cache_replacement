@@ -64,6 +64,10 @@ def _listBPTypes(option, opt, value, parser):
     ObjectList.bp_list.print()
     sys.exit(0)
 
+def _listRPTypes(option, opt, value, parser):
+    ObjectList.rp_list.print()
+    sys.exit(0)
+
 def _listHWPTypes(option, opt, value, parser):
     ObjectList.hwp_list.print()
     sys.exit(0)
@@ -186,6 +190,15 @@ def addCommonOptions(parser):
     parser.add_option("--indirect-bp-type", type="choice", default=None,
                       choices=ObjectList.indirect_bp_list.get_names(),
                       help = "type of indirect branch predictor to run with")
+    parser.add_option("--list-rp-types",
+                      action="callback", callback=_listRPTypes,
+                      help="List available cache replacement policies")
+    parser.add_option("--l2-rp", type="choice", default=None,
+                      choices=ObjectList.rp_list.get_names(),
+                      help = """
+                      type of replacement policy to use with L2 cache
+                      (if not set, use the default policy of
+                      the selected cache)""")
     parser.add_option("--list-hwp-types",
                       action="callback", callback=_listHWPTypes,
                       help="List available hardware prefetcher types")

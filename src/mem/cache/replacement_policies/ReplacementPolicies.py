@@ -67,8 +67,8 @@ class DIPRP(BIPRP):
     cxx_class = 'DIPRP'
     cxx_header = "mem/cache/replacement_policies/dip.hh"
     K = Param.Unsigned(32, "Number of sets dedicated to each policy")
-    size = Param.MemorySize('1MB', "Capacity")
-    assoc = Param.Unsigned(16, "Associativity")
+    size = Param.MemorySize(Parent.size, "Capacity")
+    assoc = Param.Unsigned(Parent.assoc, "Associativity")
     block_size = Param.Int(64, "block size in bytes")
 
 
