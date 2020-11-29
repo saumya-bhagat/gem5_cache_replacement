@@ -62,6 +62,16 @@ class BIPRP(LRURP):
 class LIPRP(BIPRP):
     btp = 0
 
+class DIPRP(BIPRP):
+    type = 'DIPRP'
+    cxx_class = 'DIPRP'
+    cxx_header = "mem/cache/replacement_policies/dip.hh"
+    K = Param.Unsigned(32, "Number of sets dedicated to each policy")
+    size = Param.MemorySize('1MB', "Capacity")
+    assoc = Param.Unsigned(16, "Associativity")
+    block_size = Param.Int(64, "block size in bytes")
+
+
 class MRURP(BaseReplacementPolicy):
     type = 'MRURP'
     cxx_class = 'MRURP'
@@ -84,6 +94,16 @@ class BRRIPRP(BaseReplacementPolicy):
 
 class RRIPRP(BRRIPRP):
     btp = 100
+
+class DRRIPRP(BRRIPRP):
+    type = 'DRRIPRP'
+    cxx_class = 'DRRIPRP'
+    cxx_header = "mem/cache/replacement_policies/drrip_rp.hh"
+    K = Param.Unsigned(32, "Number of sets dedicated to each policy")
+    size = Param.MemorySize('1MB', "Capacity")
+    assoc = Param.Unsigned(16, "Associativity")
+    block_size = Param.Int(64, "block size in bytes")
+
 
 class NRURP(BRRIPRP):
     btp = 100
