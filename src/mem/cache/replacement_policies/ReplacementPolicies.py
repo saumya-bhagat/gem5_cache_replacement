@@ -70,6 +70,7 @@ class DIPRP(BIPRP):
     size = Param.MemorySize(Parent.size, "Capacity")
     assoc = Param.Unsigned(Parent.assoc, "Associativity")
     block_size = Param.Int(64, "block size in bytes")
+    PSEL_width = Param.Int(10, "Width of PSEL counter")
 
 
 class MRURP(BaseReplacementPolicy):
@@ -100,9 +101,10 @@ class DRRIPRP(BRRIPRP):
     cxx_class = 'DRRIPRP'
     cxx_header = "mem/cache/replacement_policies/drrip_rp.hh"
     K = Param.Unsigned(32, "Number of sets dedicated to each policy")
-    size = Param.MemorySize('1MB', "Capacity")
-    assoc = Param.Unsigned(16, "Associativity")
+    size = Param.MemorySize(Parent.size, "Capacity")
+    assoc = Param.Unsigned(Parent.assoc, "Associativity")
     block_size = Param.Int(64, "block size in bytes")
+    PSEL_width = Param.Int(10, "Width of PSEL counter")
 
 
 class NRURP(BRRIPRP):
