@@ -39,7 +39,7 @@
 
 DIPRP::DIPRP(const Params *p)
     :BIPRP(p), 
-     psel(512),
+     PSEL(p->PSEL_width, 1<<(p->PSEL_width-1)),
      K(p->K),
      N(p->size / (p->block_size * p->assoc)),
      num_offset_bits(floorLog2(N/K)),
@@ -68,19 +68,17 @@ DIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
 
     switch(_set_type) {
         case FOLLOWER: 
-            if(psel > 512) 
+            if(PSEL.calcSaturation() > 0.5) 
                 BIPRP::reset(replacement_data);
             else 
                 LRURP::reset(replacement_data);
             break;
         case DEDICATE_LRU:
-            if(psel < 1023)
-                psel++;
+            PSEL++;
             LRURP::reset(replacement_data);
             break;
         case DEDICATE_BIP:
-            if(psel > 0)
-                psel--;
+            PSEL--;
             BIPRP::reset(replacement_data);
             break;
 

@@ -66,11 +66,11 @@ class SatCounter
      * @param bits How many bits the counter will have.
      * @param initial_val Starting value for the counter.
      */
-    explicit SatCounter(unsigned bits, uint8_t initial_val = 0)
+    explicit SatCounter(unsigned bits, uint16_t initial_val = 0)
         : initialVal(initial_val), maxVal((1 << bits) - 1),
           counter(initial_val)
     {
-        fatal_if(bits > 8*sizeof(uint8_t),
+        fatal_if(bits > 8*sizeof(uint16_t),
                  "Number of bits exceeds counter size");
         fatal_if(initial_val > maxVal,
                  "Saturating counter's Initial value exceeds max value.");
@@ -222,7 +222,7 @@ class SatCounter
     /**
      * Read the counter's value.
      */
-    operator uint8_t() const { return counter; }
+    operator uint16_t() const { return counter; }
 
     /** Reset the counter to its initial value. */
     void reset() { counter = initialVal; }
@@ -248,17 +248,17 @@ class SatCounter
      *
      * @return The value added to the counter to reach saturation.
      */
-    uint8_t saturate()
+    uint16_t saturate()
     {
-        const uint8_t diff = maxVal - counter;
+        const uint16_t diff = maxVal - counter;
         counter = maxVal;
         return diff;
     }
 
   private:
-    uint8_t initialVal;
-    uint8_t maxVal;
-    uint8_t counter;
+    uint16_t initialVal;
+    uint16_t maxVal;
+    uint16_t counter;
 };
 
 #endif // __BASE_SAT_COUNTER_HH__
