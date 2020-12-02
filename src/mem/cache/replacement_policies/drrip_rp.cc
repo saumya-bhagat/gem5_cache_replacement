@@ -36,10 +36,11 @@
 #include <bitset>
 #include "base/random.hh"
 #include "params/DRRIPRP.hh"
+#include "debug/PSEL_value.hh"
 
 DRRIPRP::DRRIPRP(const Params *p)
     :BRRIPRP(p), 
-     psel(512),
+     PSEL(p->PSEL_width, 1<<(p->PSEL_width-1)),
      K(p->K),
      N(p->size / (p->block_size * p->assoc)),
      num_offset_bits(floorLog2(N/K)),
@@ -71,7 +72,8 @@ DRRIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
 
     switch(_set_type) {
         case FOLLOWER: 
-            if(psel > 512) 
+            DPRINTF(PSEL_value, "FOLLOWER: PSEL = %d\n", PSEL);
+            if(PSEL.calcSaturation() > 0.5) 
                 BRRIPRP::reset(replacement_data);
             else 
                {
@@ -86,9 +88,9 @@ DRRIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
             break;
 
         case DEDICATE_RRIP:
-            if(psel < 1023)
-                psel++;
-    
+            PSEL++;
+            
+            DPRINTF(PSEL_value, "RRIP: PSEL = %d\n", PSEL);
             casted_replacement_data->rrpv.saturate();
 
             casted_replacement_data->rrpv--;
@@ -97,8 +99,8 @@ DRRIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
             
             break;
         case DEDICATE_BRRIP:
-            if(psel > 0)
-                psel--;
+            PSEL--;
+            DPRINTF(PSEL_value, "BRRIP: PSEL = %d\n", PSEL);
             BRRIPRP::reset(replacement_data);
             break;
 

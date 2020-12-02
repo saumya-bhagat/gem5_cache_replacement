@@ -70,6 +70,7 @@ class DIPRP(BIPRP):
     size = Param.MemorySize(Parent.size, "Capacity")
     assoc = Param.Unsigned(Parent.assoc, "Associativity")
     block_size = Param.Int(64, "block size in bytes")
+    PSEL_width = Param.Int(10, "Width of PSEL counter")
 
 
 class MRURP(BaseReplacementPolicy):
@@ -103,6 +104,7 @@ class DRRIPRP(BRRIPRP):
     size = Param.MemorySize(Parent.size, "Capacity")
     assoc = Param.Unsigned(Parent.assoc, "Associativity")
     block_size = Param.Int(64, "block size in bytes")
+    PSEL_width = Param.Int(10, "Width of PSEL counter")
 
 class SHIPRP(BaseReplacementPolicy):
     type = 'SHIPRP'

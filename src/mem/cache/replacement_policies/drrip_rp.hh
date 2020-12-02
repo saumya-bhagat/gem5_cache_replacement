@@ -46,7 +46,7 @@ class DRRIPRP : public BRRIPRP
 {
   protected:
     /*10 bit saturating counter*/
-    mutable uint32_t psel;
+    mutable SatCounter PSEL;
 
     /* number of sets dedicated to each policy */
     uint32_t K;

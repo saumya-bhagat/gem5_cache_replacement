@@ -36,6 +36,7 @@
 #ifndef __MEM_CACHE_REPLACEMENT_POLICIES_DIP_RP_HH__
 #define __MEM_CACHE_REPLACEMENT_POLICIES_DIP_RP_HH__
 
+#include "base/sat_counter.hh"
 #include "mem/cache/replacement_policies/bip_rp.hh"
 
 struct DIPRPParams;
@@ -46,7 +47,8 @@ class DIPRP : public BIPRP
 {
   protected:
     /*10 bit saturating counter*/
-    mutable uint32_t psel;
+    //mutable uint32_t psel;
+    mutable SatCounter PSEL;
 
     /* number of sets dedicated to each policy */
     uint32_t K;
