@@ -47,7 +47,20 @@ class SHIPRP : public BaseReplacementPolicy
         {
         }
     };
- /**
+
+    /** Signature type to imdex Signature History Counter Table (SHCT): Memory, Program Counter
+    * 0-> MEM, 
+    * 1-> PC
+    **/
+    bool signature_type; 
+
+    /**
+     * SHCT saturating counter width
+    */ 
+    const unsigned numSHCTBits; 
+     
+     
+     /**
      * Maximum Re-Reference Prediction Value possible. An entry with this
      * value as the rrpv has the longest possible re-reference interval,
      * that is, it is likely not to be used in the near future, and is
@@ -87,7 +100,14 @@ class SHIPRP : public BaseReplacementPolicy
     ~SHIPRP() {}
 
     private:
+
+    /**
+     * Create a 14bit hashed PC as per SHiP paper. 
+     * Used only for "Program Counter(PC)" type signature
+     * Direct 14bit Memory address tag is used for "Memory" type signature
+    */
     ushort hash_function(Addr address_64_bit) const;
+    
     /**
      * Invalidate replacement data to set it as the next probable victim.
      * Set RRPV as the the most distant re-reference.

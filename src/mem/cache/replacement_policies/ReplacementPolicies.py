@@ -110,12 +110,14 @@ class SHIPRP(BaseReplacementPolicy):
     type = 'SHIPRP'
     cxx_class = 'SHIPRP'
     cxx_header = "mem/cache/replacement_policies/ship_rp.hh"
+    signature_type = Param.Bool(False,"Memory signature used by default")
+    num_SHCT_bits = Param.Int(3, "Width of SHCT saturating counter")
     num_bits = Param.Int(3, "Number of bits per RRPV")
-    hit_priority = Param.Bool(False,
-        "Prioritize evicting blocks that havent had a hit recently")
-    btp = Param.Percent(3,
-        "Percentage of blocks to be inserted with long RRPV")
+    hit_priority = Param.Bool(False,"Prioritize evicting blocks that havent had a hit recently")
+    btp = Param.Percent(3,"Percentage of blocks to be inserted with long RRPV")
 
+class SHIPRP_PC(SHIPRP):
+    signature_type = True
 
 class NRURP(BRRIPRP):
     btp = 100

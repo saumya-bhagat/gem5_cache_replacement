@@ -7,7 +7,7 @@
 
 #include <cassert>
 #include <memory>
-#include "debug/Cacheset.hh"
+#include "debug/ship_rp.hh"
 #include "base/logging.hh" // For fatal_if
 #include "base/random.hh"
 #include <bitset>
@@ -16,7 +16,10 @@
 #include <fstream>*/
 
 
-SHIPRP::SHIPRP(const Params *p): BaseReplacementPolicy(p), numRRPVBits(p->num_bits),
+SHIPRP::SHIPRP(const Params *p): BaseReplacementPolicy(p), 
+signature_type(p->signature_type),
+numSHCTBits(p->num_SHCT_bits),
+numRRPVBits(p->num_bits),
 hitPriority(p->hit_priority), btp(p->btp), 
 signature_history_counter_array{}
 {
@@ -24,26 +27,7 @@ signature_history_counter_array{}
 }
 
 ushort SHIPRP::hash_function(const Addr address_tag) const{
-    //std::cout << "Given address is " << address_tag << std::endl;
-    /*Addr address_64_bit = address_tag;
     
-    std::bitset<64> k(address_64_bit);
-
-    uint64_t shifted1 = address_64_bit >> 14;
-    std::bitset<14> first_14(shifted1);
-    
-    uint64_t shifted2 = shifted1 >> 14;
-    std::bitset<14> second_14(shifted2);
-   
-    uint64_t shifted3 = shifted2 >> 14;
-    std::bitset<14> third_14(shifted3);
-   
-    std::bitset<14> final_xor_value;
-    final_xor_value = first_14 ^ second_14 ^ third_14;
-    unsigned short index = (unsigned short)final_xor_value.to_ulong() ;
-    
-   return index;
-    */
     Addr address = address_tag;
     address = address >> 8;
     uint16_t hashed_pc=0;
@@ -73,23 +57,29 @@ const
 void
 SHIPRP::touch(const std::shared_ptr<ReplacementData>& replacement_data) const
 {
-    //std::cout << "Touched" << std::endl;
     std::shared_ptr<SHIPReplData> casted_replacement_data =
         std::static_pointer_cast<SHIPReplData>(replacement_data);
     casted_replacement_data->outcome = true;
     
-    ushort index = hash_function(replacement_data->pc);
-    //ushort index = replacement_data->tag;
-    int prev_value = signature_history_counter_array[index];
-   
-    if (prev_value < 7) {
-        prev_value++;
+    ushort index;
+    
+    if(signature_type) {
+        index = hash_function(replacement_data->pc);
+        DPRINTF(ship_rp, "HIT::PC signature = %x, SHCT[%x]: %d\n",replacement_data->pc, index, signature_history_counter_array[index]);
     }
-    signature_history_counter_array[index] = prev_value;
+    else
+    {
+        index = replacement_data->tag;
+        DPRINTF(ship_rp, "HIT::Memory signature = %x, SHCT[%x]: %d\n",replacement_data->tag, index, signature_history_counter_array[index]);
+    }
+        
+
+    if(signature_history_counter_array[index] < (1<<numSHCTBits)-1)
+        signature_history_counter_array[index]++;
     
 
     casted_replacement_data->rrpv--;
-    DPRINTF(Cacheset, "HIT::pc = %x, SHCT[%x]: %d\n",replacement_data->pc, index, signature_history_counter_array[index]);
+    
 }
 
 void
@@ -99,8 +89,10 @@ SHIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
         std::static_pointer_cast<SHIPReplData>(replacement_data);
 
     casted_replacement_data->outcome = false;
-    casted_replacement_data->signature = hash_function(replacement_data->pc);
-    //casted_replacement_data->signature = (unsigned short)replacement_data->tag;
+    if(signature_type) //signature is PC type
+        casted_replacement_data->signature = hash_function(replacement_data->pc);
+    else               //signature is MEM type
+        casted_replacement_data->signature = (unsigned short)replacement_data->tag;
 
     ushort signature = casted_replacement_data->signature;
     casted_replacement_data->rrpv.saturate();
@@ -163,15 +155,10 @@ std::shared_ptr<SHIPReplData> casted_replacement_data =
 
     if (!casted_replacement_data->outcome) {
         ushort index = casted_replacement_data->signature;
-        int value = signature_history_counter_array[index];
-        if (value > 0) {
-        //std::cout << "--------------Decrementing--------------" << std::endl;
-         value--;   
-        }   
-        signature_history_counter_array[index] = value;
-        DPRINTF(Cacheset, "REPLACE:: Tag: %x, SHCT_entry: %d\n", index, signature_history_counter_array[index]);
-        //std ::cout << "ohh index " << "   "<< index << "  " 
-        //<< signature_history_counter_array[index] << std::endl;
+        if (signature_history_counter_array[index] > 0) {
+         signature_history_counter_array[index]-- ;   
+        }  
+        DPRINTF(ship_rp, "REPLACE:: Signature: %x, SHCT_entry: %d\n", index, signature_history_counter_array[index]);
     }
 
     return victim;

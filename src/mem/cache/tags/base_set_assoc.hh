@@ -51,7 +51,6 @@
 #include <string>
 #include <vector>
 
-#include "debug/Cacheset.hh"
 #include "base/logging.hh"
 #include "base/types.hh"
 #include "mem/cache/base.hh"
@@ -195,8 +194,11 @@ class BaseSetAssoc : public BaseTags
 
         // Increment tag counter
         stats.tagsInUse++;
-        //Update signature tags in replacement data for SHIP_RP
+        
+        //Update signature tags in replacement data for SHIP_RP:
+        //Program Counter type signature
         blk->replacementData->pc = pkt->req->hasPC()? pkt->req->getPC(): 0;
+        //Memory type signature
         blk->replacementData->tag = blk->tag;
 
         // Update replacement data with setindex for DIP_RP and DRRIP_RP

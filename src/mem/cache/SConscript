@@ -41,13 +41,13 @@ Source('write_queue_entry.cc')
 
 DebugFlag('Cache')
 DebugFlag('CacheComp')
-DebugFlag('Cacheset')
 DebugFlag('CachePort')
 DebugFlag('CacheRepl')
 DebugFlag('CacheTags')
 DebugFlag('CacheVerbose')
 DebugFlag('HWPrefetch')
 DebugFlag('PSEL_value')
+DebugFlag('ship_rp')
 
 # CacheTags is so outrageously verbose, printing the cache's entire tag
 # array on each timing access, that you should probably have to ask for
