@@ -127,13 +127,14 @@ def addNoISAOptions(parser):
                       help="use external port for SystemC TLM cosimulation")
     parser.add_option("--caches", action="store_true")
     parser.add_option("--l2cache", action="store_true")
+    parser.add_option("--l3cache", action="store_true")
     parser.add_option("--num-dirs", type="int", default=1)
     parser.add_option("--num-l2caches", type="int", default=1)
     parser.add_option("--num-l3caches", type="int", default=1)
     parser.add_option("--l1d_size", type="string", default="64kB")
     parser.add_option("--l1i_size", type="string", default="32kB")
     parser.add_option("--l2_size", type="string", default="1MB")
-    parser.add_option("--l3_size", type="string", default="16MB")
+    parser.add_option("--l3_size", type="string", default="1MB")
     parser.add_option("--l1d_assoc", type="int", default=2)
     parser.add_option("--l1i_assoc", type="int", default=2)
     parser.add_option("--l2_assoc", type="int", default=8)
@@ -193,7 +194,13 @@ def addCommonOptions(parser):
     parser.add_option("--list-rp-types",
                       action="callback", callback=_listRPTypes,
                       help="List available cache replacement policies")
-    parser.add_option("--l2-rp", type="choice", default=None,
+    parser.add_option("--l2-rp", type="choice", default="LRURP",
+                      choices=ObjectList.rp_list.get_names(),
+                      help = """
+                      type of replacement policy to use with L2 cache
+                      (if not set, use the default policy of
+                      the selected cache)""")
+    parser.add_option("--l3-rp", type="choice", default="LRURP",
                       choices=ObjectList.rp_list.get_names(),
                       help = """
                       type of replacement policy to use with L2 cache
@@ -217,6 +224,12 @@ def addCommonOptions(parser):
                       (if not set, use the default prefetcher of
                       the selected cache)""")
     parser.add_option("--l2-hwp-type", type="choice", default=None,
+                      choices=ObjectList.hwp_list.get_names(),
+                      help = """
+                      type of hardware prefetcher to use with the L2 cache.
+                      (if not set, use the default prefetcher of
+                      the selected cache)""")
+    parser.add_option("--l3-hwp-type", type="choice", default=None,
                       choices=ObjectList.hwp_list.get_names(),
                       help = """
                       type of hardware prefetcher to use with the L2 cache.
