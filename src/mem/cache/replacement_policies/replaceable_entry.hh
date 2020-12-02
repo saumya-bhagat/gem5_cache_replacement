@@ -39,7 +39,11 @@
  * The replacement data needed by replacement policies. Each replacement policy
  * should have its own implementation of replacement data.
  */
-struct ReplacementData { int64_t setindex;};
+struct ReplacementData { 
+  int64_t setindex; //Set number for DIP_RP and DRRIP_RP
+  int64_t tag; //Memory address based signature for SHIP_RP
+  int64_t pc;  //Instruction pc based signature for SHIP_RP 
+  };
 
 /**
  * A replaceable entry is a basic entry in a 2d table-like structure that needs

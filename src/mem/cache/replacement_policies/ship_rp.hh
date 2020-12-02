@@ -1,13 +1,13 @@
 /**
- * @
+ * @file
  * Declaration of a SHIP Policy
  * Signature Based Hit Predictor for High performance caching.
  * 
  */
-
 #ifndef __MEM_CACHE_REPLACEMENT_POLICIES_SHIP_RP_HH__
 #define __MEM_CACHE_REPLACEMENT_POLICIES_SHIP_RP_HH__
 
+#include "base/sat_counter.hh"
 #include "mem/cache/replacement_policies/base.hh"
 /*#include<fstream>
 #include<iostream>*/
@@ -22,12 +22,15 @@ class SHIPRP : public BaseReplacementPolicy
     /** SHIP-specific implementation of replacement data. */
     struct SHIPReplData : ReplacementData
     {
+        
         /**
          * Re-Reference Interval Prediction Value.
-         * A value equal to num_bits + 1 indicates an invalid entry.
+         * A value equal to max_rrpv + 1 indicates an invalid entry.
          */
-        int rrpv;
-
+        SatCounter rrpv;
+        
+        bool valid;
+        
         bool outcome;
 
  /** Signature field , of every memory region , which is present in SHCT Table **/
@@ -36,10 +39,12 @@ class SHIPRP : public BaseReplacementPolicy
         /**
          * Default constructor. Invalidate data.
          */
-        SHIPReplData(const int num_bits, bool outcome, ushort signature_computed) {
-        rrpv = num_bits+1;
-        outcome  = outcome;
-        signature = signature_computed;
+        SHIPReplData(const int num_bits) 
+          :rrpv(num_bits),
+           valid(false),
+           outcome(false),
+           signature(0)
+        {
         }
     };
  /**
@@ -49,7 +54,7 @@ class SHIPRP : public BaseReplacementPolicy
      * among the best eviction candidates.
      * A num_bits of 1 implies in a NRU.
      */
-    const int num_bits;
+    const unsigned numRRPVBits;
 
     /**
      * The hit priority (HP) policy replaces entries that do not receive cache

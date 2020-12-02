@@ -195,10 +195,13 @@ class BaseSetAssoc : public BaseTags
 
         // Increment tag counter
         stats.tagsInUse++;
+        //Update signature tags in replacement data for SHIP_RP
+        blk->replacementData->pc = pkt->req->hasPC()? pkt->req->getPC(): 0;
+        blk->replacementData->tag = blk->tag;
 
-        // Update replacement policy
+        // Update replacement data with setindex for DIP_RP and DRRIP_RP
         blk->replacementData->setindex = blk->getSet();
-        //DPRINTF(Cacheset, "Cache miss: cache blk set number %x\n", blk->replacementData->setindex);
+        //DPRINTF(Cacheset, "Cache miss: cache blk set: %x, tag number: %x\n", blk->replacementData->setindex, blk->replacementData->tag);
         replacementPolicy->reset(blk->replacementData);
     }
 

@@ -104,6 +104,16 @@ class DRRIPRP(BRRIPRP):
     assoc = Param.Unsigned(Parent.assoc, "Associativity")
     block_size = Param.Int(64, "block size in bytes")
 
+class SHIPRP(BaseReplacementPolicy):
+    type = 'SHIPRP'
+    cxx_class = 'SHIPRP'
+    cxx_header = "mem/cache/replacement_policies/ship_rp.hh"
+    num_bits = Param.Int(3, "Number of bits per RRPV")
+    hit_priority = Param.Bool(False,
+        "Prioritize evicting blocks that havent had a hit recently")
+    btp = Param.Percent(3,
+        "Percentage of blocks to be inserted with long RRPV")
+
 
 class NRURP(BRRIPRP):
     btp = 100
