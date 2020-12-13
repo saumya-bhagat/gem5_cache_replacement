@@ -81,8 +81,9 @@ gcc.cmd = [gcc.executable] + [data]+['-o',output] + ['-quiet'] \
 
 #410.bwaves
 bwaves = Process()
-bwaves.executable =  bench_dir+'/exe/bwaves_base.amd64-m64-gcc43-nn'
-#bwaves.data = bwaves.data
+bwaves_dir=bench_dir+'/410.bwaves'
+bwaves.executable =  bwaves_dir+'/run/bwaves_base.amd64-m64-gcc43-nn'
+bwaves.cwd = bwaves_dir+'/run/'
 bwaves.cmd = [bwaves.executable]
 
 #416.gamess
@@ -117,8 +118,9 @@ milc.output='su3imp.out'
 zeusmp=Process()
 zeusmp_dir='434.zeusmp/'
 zeusmp.executable = bench_dir+zeusmp_dir+\
-    '/exe/zeusmp_base.amd64-m64-gcc43-nn'
+    '/run/zeusmp_base.amd64-m64-gcc43-nn'
 zeusmp.cmd = [zeusmp.executable]
+zeusmp.cwd = bench_dir+zeusmp_dir+'/run'
 zeusmp.output = 'zeusmp.stdout'
 
 #435.gromacs
@@ -242,7 +244,7 @@ libquantum.output = 'ref.out'
 h264ref=Process()
 h264_dir = '464.h264ref/'
 h264ref.executable = bench_dir+h264_dir+\
-    '/exe/h264_base.amd64-m64-gcc43-nn'
+    '/exe/h264ref_base.amd64-m64-gcc43-nn'
 data=bench_dir+h264_dir+'/data/ref/input/foreman_ref_encoder_baseline.cfg'
 h264ref.cmd = [h264ref.executable]+['-d',data]
 h264ref.output = 'foreman_ref_encoder_baseline.out'
@@ -268,9 +270,10 @@ omnetpp.output = 'omnetpp.log'
 astar=Process()
 astar_dir='473.astar'
 astar.executable = bench_dir+astar_dir+\
-    '/exe/astar_base.amd64-m64-gcc43-nn'
+    '/run/astar_base.amd64-m64-gcc43-nn'
 data=bench_dir+astar_dir+'/data/ref/input/rivers.cfg'
 astar.cmd = [astar.executable]+[data]
+astar.cwd = bench_dir+astar_dir+'/run'
 astar.output = 'lake.out'
 
 #481.wrf
@@ -285,8 +288,9 @@ wrf.output = 'rsl.out.0000'
 sphinx3=Process()
 sphinx3_dir = '482.sphinx3/'
 sphinx3.executable =  bench_dir+sphinx3_dir+\
-    '/exe/sphinx_livepretend_base.amd64-m64-gcc43-nn'
+    '/run/sphinx_livepretend_base.amd64-m64-gcc43-nn'
 sphinx3.cmd = [sphinx3.executable]+['ctlfile', '.', 'args.an4']
+sphinx3.cwd = bench_dir+sphinx3_dir + '/run/'
 sphinx3.output = 'an4.out'
 
 #483.xalancbmk

@@ -9,8 +9,6 @@
 
 #include "base/sat_counter.hh"
 #include "mem/cache/replacement_policies/base.hh"
-/*#include<fstream>
-#include<iostream>*/
 
 struct SHIPRPParams;
 
@@ -33,7 +31,7 @@ class SHIPRP : public BaseReplacementPolicy
         
         bool outcome;
 
- /** Signature field , of every memory region , which is present in SHCT Table **/
+        /** Signature field , for every memory region and PC , which is used to index in SHCT Table **/
         ushort signature;
 
         /**
@@ -83,6 +81,9 @@ class SHIPRP : public BaseReplacementPolicy
     const unsigned btp;
 
   private:
+    /**
+     * SHCT table of 16K entries
+    **/
     mutable int signature_history_counter_array[16384];
 
   public:
@@ -104,7 +105,7 @@ class SHIPRP : public BaseReplacementPolicy
     /**
      * Create a 14bit hashed PC as per SHiP paper. 
      * Used only for "Program Counter(PC)" type signature
-     * Direct 14bit Memory address tag is used for "Memory" type signature
+     * Least significant 14bit Memory address tag is used for "Memory" type signature
     */
     ushort hash_function(Addr address_64_bit) const;
     

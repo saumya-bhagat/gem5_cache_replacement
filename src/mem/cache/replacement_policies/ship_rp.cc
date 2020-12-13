@@ -1,5 +1,5 @@
 /**
- * SHIP Implementation based on research paper.
+ * SHIP Implementation
  *
  */
 
@@ -8,12 +8,11 @@
 #include <cassert>
 #include <memory>
 #include "debug/ship_rp.hh"
-#include "base/logging.hh" // For fatal_if
+#include "base/logging.hh"
 #include "base/random.hh"
 #include <bitset>
 #include "params/SHIPRP.hh"
-/*#include <iostream>
-#include <fstream>*/
+
 
 
 SHIPRP::SHIPRP(const Params *p): BaseReplacementPolicy(p), 
@@ -64,44 +63,58 @@ SHIPRP::touch(const std::shared_ptr<ReplacementData>& replacement_data) const
     ushort index;
     
     if(signature_type) {
-        index = hash_function(replacement_data->pc);
-        DPRINTF(ship_rp, "HIT::PC signature = %x, SHCT[%x]: %d\n",replacement_data->pc, index, signature_history_counter_array[index]);
+        if(replacement_data->pc != 0) {
+            index = hash_function(replacement_data->pc); //14 bit hashed PC signature
+            //index = (replacement_data->pc) & ((1<<14)-1); //14 bit lower PC signature
+            DPRINTF(ship_rp, "HIT::PC signature = %x, SHCT[%x]: %d\n",replacement_data->pc, index, signature_history_counter_array[index]);
+            if(signature_history_counter_array[index] < (1<<numSHCTBits)-1)
+                signature_history_counter_array[index]++;
+        } 
     }
     else
     {
-        index = replacement_data->tag;
+        index = replacement_data->tag & ((1<<14)-1); //14bit memory signature
         DPRINTF(ship_rp, "HIT::Memory signature = %x, SHCT[%x]: %d\n",replacement_data->tag, index, signature_history_counter_array[index]);
+        if(signature_history_counter_array[index] < (1<<numSHCTBits)-1)
+            signature_history_counter_array[index]++;
     }
-        
-
-    if(signature_history_counter_array[index] < (1<<numSHCTBits)-1)
-        signature_history_counter_array[index]++;
-    
-
     casted_replacement_data->rrpv--;
+    DPRINTF(ship_rp, "HIT:: SHCT[%x]: %d, RRPV: %d\n", index, signature_history_counter_array[index], casted_replacement_data->rrpv.operator uint16_t());
+
     
 }
 
 void
 SHIPRP::reset(const std::shared_ptr<ReplacementData>& replacement_data) const
-{
+{   
+    bool invalid_pc = false;
     std::shared_ptr<SHIPReplData> casted_replacement_data =
         std::static_pointer_cast<SHIPReplData>(replacement_data);
 
     casted_replacement_data->outcome = false;
     if(signature_type) //signature is PC type
-        casted_replacement_data->signature = hash_function(replacement_data->pc);
-    else               //signature is MEM type
-        casted_replacement_data->signature = (unsigned short)replacement_data->tag;
+    {
+        if(replacement_data->pc != 0)
+            //casted_replacement_data->signature = (replacement_data->pc) & ((1<<14)-1);
+           casted_replacement_data->signature = hash_function(replacement_data->pc);
+        else
+            invalid_pc = true;
+    }   
+    else              //signature is MEM type
+        casted_replacement_data->signature = (unsigned short)(replacement_data->tag & ((1<<14)-1));
 
-    ushort signature = casted_replacement_data->signature;
     casted_replacement_data->rrpv.saturate();
-    
-    if (signature_history_counter_array[signature]!=0) { //Block has been accessed before
-        casted_replacement_data->rrpv--;
+    if(!invalid_pc)
+    {
+        ushort signature = casted_replacement_data->signature;
+        if (signature_history_counter_array[signature]!=0) { //Block has been accessed before
+            casted_replacement_data->rrpv--;
+        }
+        // Mark entry as ready to be used
+        DPRINTF(ship_rp, "MISS::SHCT[%x]: %u\n",signature, signature_history_counter_array[signature]);
+        casted_replacement_data->valid = true;
     }
-    // Mark entry as ready to be used
-    casted_replacement_data->valid = true;
+    
 }
 
 ReplaceableEntry*
@@ -155,10 +168,11 @@ std::shared_ptr<SHIPReplData> casted_replacement_data =
 
     if (!casted_replacement_data->outcome) {
         ushort index = casted_replacement_data->signature;
+        DPRINTF(ship_rp, "REPLACE:: Signature: %x, SHCT_entry: %d, RRPV: %d\n", index, signature_history_counter_array[index], casted_replacement_data->rrpv.operator uint16_t());
         if (signature_history_counter_array[index] > 0) {
          signature_history_counter_array[index]-- ;   
         }  
-        DPRINTF(ship_rp, "REPLACE:: Signature: %x, SHCT_entry: %d\n", index, signature_history_counter_array[index]);
+        
     }
 
     return victim;
