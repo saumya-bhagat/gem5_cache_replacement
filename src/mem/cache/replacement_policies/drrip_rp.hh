@@ -60,9 +60,6 @@ class DRRIPRP : public BRRIPRP
     /*number of constituency bits */
     uint32_t num_constituency_bits;
 
-    /*Select type of set*/
-    //SET_TYPE set_type = FOLLOWER;
-
   public:
     /** Convenience typedef. */
     typedef DRRIPRPParams Params;

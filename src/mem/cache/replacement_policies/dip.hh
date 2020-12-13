@@ -28,7 +28,6 @@
 
 /**
  * @file
- 
  *
  *
  */
@@ -47,7 +46,6 @@ class DIPRP : public BIPRP
 {
   protected:
     /*10 bit saturating counter*/
-    //mutable uint32_t psel;
     mutable SatCounter PSEL;
 
     /* number of sets dedicated to each policy */
@@ -61,9 +59,6 @@ class DIPRP : public BIPRP
 
     /*number of constituency bits */
     uint32_t num_constituency_bits;
-
-    /*Select type of set*/
-    //SET_TYPE set_type = FOLLOWER;
 
   public:
     /** Convenience typedef. */
